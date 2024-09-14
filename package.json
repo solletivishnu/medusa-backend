@@ -31,24 +31,27 @@
     "@medusajs/event-bus-local": "1.9.9",
     "@medusajs/event-bus-redis": "^1.8.14",
     "@medusajs/file-local": "1.0.4",
-    "@medusajs/medusa": "^1.20.9",
+    "@medusajs/medusa": "^1.7.0",
+    "@swc/core": "^1.7.26",
     "@tanstack/react-query": "4.22.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "16.3.1",
     "express": "^4.17.2",
+    "glob": "^11.0.0",
     "medusa-fulfillment-manual": "1.1.41",
-    "medusa-interfaces": "1.3.10",
+    "medusa-interfaces": "^1.3.10",
     "medusa-payment-manual": "1.0.25",
-    "medusa-payment-stripe": "6.0.11",
+    "medusa-payment-stripe": "^1.1.53",
     "prism-react-renderer": "^2.0.4",
-    "typeorm": "0.3.16"
+    "typeorm": "0.3.16",
+    "webpack": "^5.94.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
     "@babel/preset-typescript": "^7.21.4",
-    "@medusajs/medusa-cli": "1.3.23",
+    "@medusajs/medusa-cli": "^1.1.8",
     "@stdlib/number-float64-base-normalize": "0.0.8",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
@@ -58,7 +61,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^6.8.0",
     "jest": "^27.3.1",
-    "rimraf": "^3.0.2",
+    "rimraf": "^6.0.1",
     "ts-jest": "^27.0.7",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.2"
@@ -90,6 +93,6 @@
     "testEnvironment": "node"
   },
   "resolutions": {
-    "glob": "^7.1.6"
+    "medusa-interfaces": "1.3.10"
   }
 }

@@ -1,0 +1,47 @@
+version: '3'
+services:
+  medusa-backend:
+    image: vishnu9/medusa:2.5
+    container_name: medusa_backend
+    ports:
+      - "9000:9000"  # Backend API port
+      - "7001:7001"  # Admin panel port
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=something
+      - COOKIE_SECRET=something
+      - DATABASE_URL=postgres://postgres:vishnuvishnu@postgres:5432/medusa-pby2
+    command: sh -c "npx medusa migrations run && npx medusa develop"
+
+    volumes:
+      - ./data:/app/data
+    networks:
+      - medusa-backend_default
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - medusa-backend_default
+  postgres:
+    image: vishnu9/postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: vishnuvishnu
+      POSTGRES_DB: medusa-pby2
+    networks:
+      - medusa-backend_default
+networks:
+  medusa-backend_default:
+    driver: bridge
+
+
+
+
+
+
+
+      
