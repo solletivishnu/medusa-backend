@@ -1,231 +1,67 @@
-name: Test CLI
+name: CI/CD Pipeline
+
 on:
- pull_request:
-  branches:
-    - 'feat/v2'
-    - 'feat/v2-ci'
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
 
 jobs:
-  test-cli-yarn:
-    name: "Test CLI (Yarn)"
-    env:
-      NODE_ENV: CI
-      REDIS_URL: redis://localhost:6379
-      DATABASE_URL: "postgres://postgres:postgres@localhost/cli-test"
-      POSTGRES_URL: "postgres://postgres:postgres@localhost/cli-test"
-    services:
-      redis:
-        image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
- 
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: cli-test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
- 
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
 
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-  
-      - name: Install Dependencies
-        run: yarn install
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Check CLI tool is installed
-        run: ./node_modules/.bin/medusa -v
+    - name: Build Docker Compose Images
+      run: |
+        docker-compose -f docker-compose.yaml build
 
-      - name: run build
-        run: yarn build
 
-      - name: Run migrations
-        run: npx medusa migrations run
+    - name: Push Medusa Docker image
+      run: |
+        docker-compose -f docker-compose.yaml push
 
-      - name: Sync links
-        run: npx medusa links sync
-
-      - name: Run seed
-        run: yarn seed
-
-      - name: Run development server
-        run: yarn dev &
-
-      - name: Wait for live server response
-        shell: "bash"
-        run: ./.github/scripts/wait-for-server-live.sh
-
-      - name: Kill server
-        shell: "bash"
-        run: kill -9 $(lsof -t -i :9000)
-          
-  test-cli-npm:
-    name: "Test CLI (npm)"
-    env:
-      NODE_ENV: CI
-      REDIS_URL: redis://localhost:6379
-      DATABASE_URL: "postgres://postgres:postgres@localhost/cli-test"
-      POSTGRES_URL: "postgres://postgres:postgres@localhost/cli-test"
-    services: 
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: cli-test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        version: 'latest'
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        credentials: ${{ secrets.GCP_CREDENTIALS }}
+    
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
  
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      
+    - name: Set up gcloud CLI
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        version: 'latest'
 
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: "npm"
-  
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Check CLI tool is installed
-        run: ./node_modules/.bin/medusa -v
-
-      - name: run medusa build
-        run: npm run build
-
-      - name: Run migrations
-        run: npx medusa migrations run
-
-      - name: Sync links
-        run: npx medusa links sync
-
-      - name: Run seed
-        run: npm run seed
-
-      - name: Run development server
-        run: npm run dev -- &
-
-      - name: Wait for live server response
-        shell: "bash"
-        run: ./.github/scripts/wait-for-server-live.sh
-
-      - name: Kill server
-        shell: "bash"
-        run: kill -9 $(lsof -t -i :9000)
-          
-  test-cli-pnpm:
-    name: "Test CLI (pnpm)"
-    env:
-      NODE_ENV: CI
-      REDIS_URL: redis://localhost:6379
-      DATABASE_URL: "postgres://postgres:postgres@localhost/cli-test"
-      POSTGRES_URL: "postgres://postgres:postgres@localhost/cli-test"
-    services: 
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: cli-test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
- 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          access_token: ${{ github.token }}
-
-      - name: Create pnpm-lock.yaml
-        run: touch pnpm-lock.yaml
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 6.32.9
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: "pnpm"
-  
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Check CLI tool is installed
-        run: ./node_modules/.bin/medusa -v
-
-      - name: run medusa build
-        run: pnpm run build
-
-      - name: Run migrations
-        run: npx medusa migrations run
-
-      - name: Sync links
-        run: npx medusa links sync
-
-      - name: Run seed
-        run: pnpm run seed
-
-      - name: Run development server
-        run: pnpm run dev -- &
-
-      - name: Wait for live server response
-        shell: "bash"
-        run: ./.github/scripts/wait-for-server-live.sh
-
-      - name: Kill server
-        shell: "bash"
-        run: kill -9 $(lsof -t -i :9000)
-          
+    - name: Deploy to Kubernetes
+      run: |
+        gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project firm-amp-429105-j1
+        kubectl apply -f dataredis.yaml --validate=false
+        kubectl apply -f datapostgres.yaml --validate=false
+        kubectl apply -f deployement.yaml --validate=false
+        kubectl get services 
+        

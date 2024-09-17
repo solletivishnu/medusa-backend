@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  labels:
+    app: db
+    name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      name: db
+      labels:
+        app: db
+    spec:
+      containers:
+      - image: vishnu9/postgres
+        name: db
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: vishnuvishnu
+        ports:
+        - containerPort: 5432
+          name: db
+          
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    app: db
+    name: db
+spec:
+  type: ClusterIP
+  ports:
+  - name: db
+    port: 5432
+    targetPort: 5432
+  selector:
+    app: db

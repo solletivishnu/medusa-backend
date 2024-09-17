@@ -16,6 +16,20 @@ const loaders = require("@medusajs/medusa/dist/loaders/index").default
       const configModule = container.resolve("configModule")
       const port = process.env.PORT ?? configModule.projectConfig.port ?? 9000
 
+      // Serve static files (if any) or handle the root path
+      app.get("/", (req, res) => {
+        // Redirect root path to /app
+        res.redirect("/app")
+      })
+
+      // Example app route if you have any static or dynamic app content at /app
+      app.get("/app", (req, res) => {
+        // Render or serve the content for /app, adjust this to match your actual content
+        res.send("Medusa App is running!")
+        // Alternatively, if you have an HTML file:
+        // res.sendFile(__dirname + '/path-to-your-app.html');
+      })
+
       const server = GracefulShutdownServer.create(
         app.listen(port, (err) => {
           if (err) {

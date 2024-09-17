@@ -1,0 +1,21 @@
+# Ignore node_modules from the local environment (install in Docker)
+node_modules/
+
+# Ignore logs and temporary files
+*.log
+*.tsbuildinfo
+.cache/
+
+# Ignore the build and dist directories (only if they are built inside Docker)
+dist/
+build/
+
+
+# Ignore version control files
+.git
+.gitignore
+
+# Ignore IDE/editor specific files
+.idea/
+.vscode/
+.DS_Store

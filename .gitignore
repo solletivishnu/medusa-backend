@@ -1,28 +1,35 @@
-/dist
-.DS_Store
-/uploads
-/node_modules
-yarn-error.log
+# Ignore node modules, should be installed in the Docker image or locally
+node_modules/
 
+# Ignore build artifacts
+build/
+dist/
 
+# Ignore logs and temporary files
+*.log
+*.lock
+*.tsbuildinfo
+.cache/
 
+# Ignore environment config (optional, depending on how you manage secrets)
+.env
 
-.idea
-
-coverage
-
-!src/**
-
-./tsconfig.tsbuildinfo
-package-lock.json
-yarn.lock
-medusa-db.sql
-build
-.cache
-
+# Ignore Yarn-related files if you are using NPM
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Ignore IDE/editor specific files
+.idea/
+.vscode/
+.DS_Store
+
+# Ignore Medusa-specific database files
+medusa-db.sql
+uploads/
+
+# Ignore coverage reports
+coverage/

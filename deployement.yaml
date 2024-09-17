@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medusa
+  labels:
+    app: medusa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: medusa
+  template:
+    metadata:
+      labels:
+        app: medusa
+    spec:
+      containers:
+        - name: medusa-backend
+          image: vishnu9/medusaa:8.5
+          command: ["/bin/sh", "-c", "npx medusa migrations run && npx medusa start"]
+          ports:
+            - containerPort: 9000
+          env:
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "vishnuvishnu"
+            - name: POSTGRES_DB
+              value: "medusa-pby2"
+            - name: POSTGRES_HOST
+              value: "db"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: MEDUSA_BACKEND_URL
+              value: "http://108.59.83.192:9000"
+            - name: DATABASE_URL
+              value: "postgres://postgres:vishnuvishnu@db:5432/medusa-pby2"
+            - name: REDIS_URL
+              value: "redis://redis:6379"
+          volumeMounts:
+            - mountPath: /medusa
+              name: medusa-data
+      volumes:
+        - name: medusa-data
+          emptyDir: {}
+
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: medusa
+  labels: 
+    app: medusa
+    name: medusa
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: medusa
+
