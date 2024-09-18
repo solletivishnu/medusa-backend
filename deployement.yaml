@@ -32,7 +32,7 @@ spec:
             - name: REDIS_HOST
               value: "redis"
             - name: MEDUSA_BACKEND_URL
-              value: "http://loccalhost:9000"
+              value: "http://localhost:9000"
             - name: DATABASE_URL
               value: "postgres://postgres:vishnuvishnu@db:5432/medusa-pby2"
             - name: REDIS_URL
