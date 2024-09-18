@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
         - name: medusa-backend
-          image: vishnu9/medusaa:8.5
-          command: ["/bin/sh", "-c", "npx medusa migrations run && npx medusa start"]
+          image: vishnu9/medusaproj:6.6
+          command: ["/bin/sh", "-c", "npx medusa migrations run && npm run seed && npx medusa start"]
           ports:
             - containerPort: 9000
           env:
@@ -32,7 +32,7 @@ spec:
             - name: REDIS_HOST
               value: "redis"
             - name: MEDUSA_BACKEND_URL
-              value: "http://108.59.83.192:9000"
+              value: "http://loccalhost:9000"
             - name: DATABASE_URL
               value: "postgres://postgres:vishnuvishnu@db:5432/medusa-pby2"
             - name: REDIS_URL
