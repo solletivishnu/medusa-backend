@@ -1,11 +1,11 @@
 version: '3'
 services:
   medusa-backend:
-    image: vishnu9/medusaa:8.5
+    image: vishnu9/medusaproj:6.6
     container_name: medusa_backend
     ports:
       - "9000:9000"  # Backend API port
-      - "7001:7001"  # Admin panel port
+      
     depends_on:
       - postgres
       - redis
@@ -14,7 +14,7 @@ services:
       - JWT_SECRET=something
       - COOKIE_SECRET=something
       - DATABASE_URL=postgres://postgres:vishnuvishnu@postgres:5432/medusa-pby2
-    command: sh -c "npx medusa migrations run && npx medusa start"  # Run migrations and start the application
+    command: sh -c "npx medusa migrations run && npm run seed && npx medusa start"  # Run migrations and start the application
 
     volumes:
       - ./data:/app/data
@@ -32,6 +32,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: vishnuvishnu
       POSTGRES_DB: medusa-pby2
+    ports:
+      - "5432:5432"
     networks:
       - medusa-backend_default
 networks:
