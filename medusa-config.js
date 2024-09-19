@@ -29,26 +29,13 @@ const ADMIN_CORS =
 const STORE_CORS = process.env.STORE_CORS || "http://localhost:8000";
 
 const DATABASE_URL =
-  process.env.DATABASE_URL || "postgres://localhost/medusa-starter-default";
+  process.env.DATABASE_URL || "postgres://postgres:vishnuvishnu@postgres:5432/medusa-pby2";
 
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_URL = process.env.REDIS_URL || "redis://redis:6379";
 
 const plugins = [
-
-
-  {
-    resolve: `medusa-fulfillment-manual`,
-    options: {
-      // Configuration options for the plugin
-    },
-  },
-  {
-    resolve: `medusa-payment-manual`,
-    options: {
-      // Configuration options for the plugin
-    },
-  },
-
+  `medusa-fulfillment-manual`,
+  `medusa-payment-manual`,
   {
     resolve: `@medusajs/file-local`,
     options: {
@@ -89,6 +76,7 @@ const projectConfig = {
   store_cors: STORE_CORS,
   database_url: DATABASE_URL,
   admin_cors: ADMIN_CORS,
+  // Uncomment the following lines to enable REDIS
   redis_url: REDIS_URL
 };
 
